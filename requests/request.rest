@@ -1,9 +1,19 @@
 GET http://localhost:3000/api/customers
 
+
 ###
-POST http://localhost:3000/api/customers HTTP/1.1
+POST http://localhost:3000/api/payment/create HTTP/1.1
 Content-Type: application/json
 
 {
-    "customer": "Filandrix"
+    "amount": 1999,
+    "payment_method": "boleto",
+    "boleto": "10000000000000",
+    "buyerName": "Joao",
+    "buyerEmail": "joao@gmail.com",
+    "buyerCpf": "999-999-999-00",
+    "clientID": "100100100",
 }
+
+###
+POST http://localhost:3000/api/payment/create HTTP/1.1
