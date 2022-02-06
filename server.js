@@ -4,10 +4,12 @@ const dotenv = require('dotenv');
 
 const app = express();
 const paymentRoute = require('./routes/payment');
+const buyerRouter = require('./routes/buyer');
 
 dotenv.config();
 app.use(express.json());
 app.use('/api', paymentRoute);
+app.use('/api', buyerRouter);
 
 mongoose
   .connect(process.env.MONGO_URL)

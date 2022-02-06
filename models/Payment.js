@@ -19,8 +19,8 @@ const PaymentSchema = new mongoose.Schema(
     cardCVV: { type: String },
     buyerName: { type: String },
     buyerEmail: { type: String },
-    buyerCpf: { type: Number },
-    clientID: { type: String, required: true },
+    buyerCpf: { type: String },
+    clientID: { type: String },
   },
   {
     timestamps: true,

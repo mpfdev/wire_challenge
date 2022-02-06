@@ -10,7 +10,7 @@ router.get('/payment', async (req, res) => {
   try {
     const allPayments = await Payment.find();
     res.send(allPayments);
-    console.log(allPayments);
+    console.log(`All payments on DB ${allPayments}`);
   } catch (e) {
     res.status(500).json({ error: e.message });
     console.error(e);
@@ -34,40 +34,57 @@ router.post('/payment/create', async (req, res) => {
     clientID,
   } = req.body;
 
-  //Verify in the collection if we have the buyerCPF registred in the database
-  //otherwise create a new buyer
-  Buyer.find({ cpf })
-    .then((eachBuyerCpf) => {
-      if (eachBuyerCpf) {
+  //Functions =========================
+  //Generate Boleto
+  function generateBoleto() {
+    let serialNumbers = [];
+    for (let i = 0; i <= 47; i++) {
+      serialNumbers.push(Math.floor(Math.random() * 9));
+    }
+
+    return serialNumbers.join('');
+  }
+
+  //End Functions =========================
+  //Look if there is a Buyer in the DB
+  //If not, create one
+  Buyer.find({ buyerCpf })
+    .then((eachCPF) => {
+      if (eachCPF) {
         return;
       }
 
-      const newBuyer = new Buyer({
-        name: buyerName,
-        email: buyerEmail,
-        cpf: buyerCpf,
+      Buyer.create({
+        buyerName: buyerName,
+        buyerEmail: buyerEmail,
+        buyerCpf: buyerCpf,
       });
 
-      newBuyer.save();
+      console.log(Buyer);
     })
     .catch((err) => {
       console.error(err);
     });
 
-  //Payment_method ===> BOLETO
-  //Generate boleto numbers
+  //payment_method is boleto
   if (payment_method.toLowerCase() === 'boleto') {
-    const newBoleto = generateBoleto();
+    try {
+      const newBoleto = generateBoleto();
+      const cursor = Payment.find({});
+      const numberOfPayments = await cursor.toArray;
 
-    Payment.create({
-      amount: amount,
-      payment_method: payment_method.toLowerCase(),
-      boleto: newBoleto,
-      buyerName: buyerName,
-      buyerEmail: buyerEmail,
-      buyerCpf: buyerCpf,
-      clientID: clientID,
-    });
+      Payment.create({
+        amount: amount,
+        payment_method: payment_method.toLowerCase(),
+        boleto: newBoleto,
+        buyerName: buyerName,
+        buyerEmail: buyerEmail,
+        buyerCpf: buyerCpf,
+        clientID: numberOfPayments.length,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 });
 
