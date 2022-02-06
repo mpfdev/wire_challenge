@@ -21,6 +21,7 @@ const PaymentSchema = new mongoose.Schema(
     buyerEmail: { type: String },
     buyerCpf: { type: String },
     clientID: { type: String },
+    status: { type: String },
   },
   {
     timestamps: true,

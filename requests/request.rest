@@ -8,9 +8,26 @@ Content-Type: application/json
 {
     "amount": 1999,
     "payment_method": "boleto",
-    "buyerCpf": "100100200111",
-    "buyerName": "Joao",
-    "buyerEmail": "jaoo1@gmail.com"
+    "buyerCpf": "00001111111111112",
+    "buyerName": "marie",
+    "buyerEmail": "Jãasdo@jao1a.com"
+}
+
+###
+POST http://localhost:3000/api/payment/create HTTP/1.1
+Content-Type: application/json
+
+{
+    "amount": 1999,
+    "payment_method": "card",
+    "buyerCpf": "00001111111111112",
+    "buyerName": "marie",
+    "buyerEmail": "Jãasdo@jao1a.com",
+    "cardHolderName": "Joaoooo",
+    "cardBrand": "Mastersa",
+    "cardNumber": "454545454545454545",
+    "cardExpirationDate": "32/13/0202",
+    "cardCVV": "9999"
 }
 
 ###

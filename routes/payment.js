@@ -1,7 +1,4 @@
 const router = require('express').Router();
-const Buyer = require('../models/Buyer');
-const Card = require('../models/Card');
-const Client = require('../models/Client');
 const Payment = require('../models/Payment');
 
 //@Get all the payments
@@ -28,6 +25,7 @@ router.post('/payment/create', async (req, res) => {
     cardNumber,
     cardExpirationDate,
     cardCVV,
+    cardBrand,
     buyerName,
     buyerEmail,
     buyerCpf,
@@ -45,45 +43,61 @@ router.post('/payment/create', async (req, res) => {
     return serialNumbers.join('');
   }
 
+  //Is it successful?
+  function isSuccessful() {
+    return Math.floor(Math.random() * 2) === 0 ? 'approved' : 'reproved';
+  }
+
   //End Functions =========================
-  //Look if there is a Buyer in the DB
-  //If not, create one
-  Buyer.find({ buyerCpf })
-    .then((eachCPF) => {
-      if (eachCPF) {
-        return;
-      }
-
-      Buyer.create({
-        buyerName: buyerName,
-        buyerEmail: buyerEmail,
-        buyerCpf: buyerCpf,
-      });
-
-      console.log(Buyer);
-    })
-    .catch((err) => {
-      console.error(err);
-    });
 
   //payment_method is boleto
   if (payment_method.toLowerCase() === 'boleto') {
     try {
-      const newBoleto = generateBoleto();
-      const cursor = Payment.find({});
-      const numberOfPayments = await cursor.toArray;
+      const novoBoleto = generateBoleto();
 
       Payment.create({
         amount: amount,
         payment_method: payment_method.toLowerCase(),
-        boleto: newBoleto,
+        boleto: novoBoleto,
+        buyerName: buyerName,
+        buyerCpf: buyerCpf,
+        buyerEmail: buyerEmail,
+        clientID: clientID,
+      });
+
+      res.status(200).json({
+        boleto: `${novoBoleto} gerado`,
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  //payment_method is card
+  if (payment_method.toLowerCase() === 'card') {
+    try {
+      const verifyStatus = isSuccessful();
+
+      Payment.create({
+        amount: amount,
+        payment_method: payment_method.toLowerCase(),
+        cardHolderName: cardHolderName,
+        cardBrand: cardBrand,
+        cardNumber: cardNumber,
+        cardExpirationDate: cardExpirationDate,
+        cardCVV: cardCVV,
         buyerName: buyerName,
         buyerEmail: buyerEmail,
         buyerCpf: buyerCpf,
-        clientID: numberOfPayments.length,
+        clientID: clientID,
+        status: verifyStatus,
       });
-    } catch (err) {
-      console.log(err);
+
+      res.status(200).json({
+        status: `${verifyStatus}`,
+      });
+    } catch (e) {
+      console.error(e);
     }
   }
 });
